@@ -1,14 +1,22 @@
-import express from "express";
-const app = express();
+import express from "express"
+import slackRouter from "./slack"
+import cors from "cors"
+const app = express()
 
-require("dotenv").config();
+require("dotenv").config()
 
-const port = process.env.PORT || 1999;
+const port = process.env.PORT || 1999
+
+app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+  res.send("Hello World!")
+})
+
+app.use("/slack", slackRouter)
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+  console.log(`Example app listening at http://localhost:${port}`)
+})
