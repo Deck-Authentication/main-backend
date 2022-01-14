@@ -12,48 +12,49 @@ const authHeaders = {
 
 // Limit (requests per minute): 300
 // Burst (requests): 300
-export function getUser() {}
+export async function getUser(id = "") {
+  const url =
+    id !== ""
+      ? `${SLACK_SCIM_API_URL}/Users/${id}`
+      : `${SLACK_SCIM_API_URL}/Users`
+  const response = await axios.get(url, { headers: authHeaders })
+  return response.data
+}
 
 // Limit (requests per minute): 180
 // Burst (requests): 20
-export function createUser() {}
+export async function createUser() {}
 
 // Limit (requests per minute): 180
 // Burst (requests): 20
-export function updateUser() {}
+export async function updateUser() {}
 
 // Limit (requests per minute): 180
 // Burst (requests): 20
-export function deleteUser() {}
+export async function deleteUser() {}
 
 // Limit (requests per minute): 300
 // Burst (requests): 300
-export function getGroup() {}
+export async function getGroup() {}
 
 // Limit (requests per minute): 180
 // Burst (requests): 20
-export function createGroup() {}
+export async function createGroup() {}
 
 // Limit (requests per minute): 180
 // Burst (requests): 80
-export function updateGroup() {}
+export async function updateGroup() {}
 
 // Limit (requests per minute): 180
 // Burst (requests): 20
-export function deleteGroup() {}
+export async function deleteGroup() {}
 
 export async function getServiceProviderConfigs() {
-  console.log("authHeaders = ", authHeaders)
-
   const result = await axios({
     method: "get",
     url: `${SLACK_SCIM_API_URL}/ServiceProviderConfigs`,
     headers: authHeaders,
-  }).then((res) => {
-    console.log(res.statusText)
-    console.log(res.status)
-    return res.data
-  })
+  }).then((res) => res.data)
 
   return result
 }
