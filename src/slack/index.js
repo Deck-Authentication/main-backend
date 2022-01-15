@@ -42,13 +42,15 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
   // Assuming that there is no '#' sign in the channel name
   // This is an edge case that must be handled by the frontend
   // emails is an array of string
-  const { emails, channelName } = req.body
+  const { emails, channels } = req.body
 
   // The Slack API only allows 1000 users to be invited at a time: https://api.slack.com/methods/conversations.invite#arg_channel
   if (emails.length > 1000)
     res.json(413).json({
       message: "Error: only up to 1000 emails can be invited each API call",
     })
+  else if (emails.length <= 0)
+    res.json(417).json({ message: "Error: no emails were provided" })
 
   let userIds = []
 
@@ -63,33 +65,33 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
   }
 
   // Get all channels in the workspace, save into an object where keys are channel names
+  // for O(1) lookup, we save all channels into an object
   let allChannels = {}
   await slackUtils
     .listConversations()
-    .then((channels) =>
-      channels.map(
+    .then((channelsObj) =>
+      channelsObj.map(
         (channel) => (allChannels[channel.name] = lodash.cloneDeep(channel))
       )
     )
     .catch((err) => res.status(500).json({ message: err }))
 
-  // for O(1) lookup, we should save all channels into an object
-
-  const matchedChannel = allChannels.find(
-    (channel) => channel.name === channelName && channel.is_channel
+  let matchedChannels = []
+  channels.map(
+    (channelName) =>
+      matchChannel.hasOwnProperty(channelName) &&
+      matchedChannels.push(matchChannel[channelName])
   )
 
-  // matchedChannels should be an array
-
-  if (!matchedChannel)
+  if (!matchedChannels.length)
     res.status(404).json({ message: `Channel ${channelName} not found` })
 
-  const channelId = matchedChannel.id
+  const channelIds = matchedChannels.map((matchedChannel) => matchedChannel.id)
 
   // join the array userIds to a comma-separated string of user IDs to comply with Slack standards
   // Example: W1234567890,U2345678901,U3456789012
   const invitation = await slackUtils
-    .inviteToChannel(userIds.join(), channelId)
+    .inviteToChannel(userIds.join(), channelIds)
     .catch((err) => res.status(500).json({ message: err }))
 
   res.status(200).json({ invitation })
