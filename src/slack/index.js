@@ -24,6 +24,12 @@ slackRouter.get("/ServiceProviderConfigs", async (req, res) => {
   res.status(200).json({ serviceProviderConfigs })
 })
 
+slackRouter.get("/listConversations", async (req, res) => {
+  const conversations = await slackUtils.listConversations()
+
+  res.status(200).json({ conversations })
+})
+
 // slackRouter.use((error, req, res, next) => {
 //   res.status(500).json({ error })
 // })

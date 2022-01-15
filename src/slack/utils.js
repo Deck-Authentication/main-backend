@@ -6,7 +6,7 @@ config()
 const SLACK_SCIM_API = "https://api.slack.com/scim/v1"
 const SLACK_API = "https://slack.com/api"
 
-const authHeaders = {
+const scimAuthHeaders = {
   Authorization: `Bearer ${process.env.SLACK_ORG_ADMIN_USER_TOKEN}`,
   "Content-Type": "application/json",
 }
@@ -22,7 +22,7 @@ const authHeaders = {
 export async function getUser(id = "") {
   const url =
     id !== "" ? `${SLACK_SCIM_API}/Users/${id}` : `${SLACK_SCIM_API}/Users`
-  const response = await axios.get(url, { headers: authHeaders })
+  const response = await axios.get(url, { headers: scimAuthHeaders })
   return response.data
 }
 
@@ -54,11 +54,14 @@ export async function updateGroup() {}
 // Burst (requests): 20
 export async function deleteGroup() {}
 
+/**
+ * @returns A list of service provider configs.
+ */
 export async function getServiceProviderConfigs() {
   const result = await axios({
     method: "get",
     url: `${SLACK_SCIM_API}/ServiceProviderConfigs`,
-    headers: authHeaders,
+    headers: scimAuthHeaders,
   }).then((res) => res.data)
 
   return result
@@ -71,8 +74,6 @@ export async function getServiceProviderConfigs() {
  * @returns The user ID of the user with the given email address.
  */
 export async function emailToUserId(email) {
-  console.log("email = ", email)
-
   const config = {
     method: "get",
     url: `${SLACK_API}/users.lookupByEmail?email=${email}`,
@@ -87,4 +88,21 @@ export async function emailToUserId(email) {
   if (!res.ok) throw new Error(`Slack API error: ${res.error}`)
 
   return res.user.id
+}
+
+export async function listConversations() {
+  const config = {
+    method: "get",
+    url: `${SLACK_API}/conversations.list`,
+    headers: {
+      Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+      Cookie: "b=394400ceb27cb8b995ced7ab7e2247bc",
+    },
+  }
+
+  const res = await axios(config).then((res) => res.data)
+
+  if (!res.ok) throw new Error(`Slack API error: ${res.error}`)
+
+  return res.channels
 }
