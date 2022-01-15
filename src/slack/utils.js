@@ -23,6 +23,9 @@ export async function getUser(id = "") {
   const url =
     id !== "" ? `${SLACK_SCIM_API}/Users/${id}` : `${SLACK_SCIM_API}/Users`
   const response = await axios.get(url, { headers: scimAuthHeaders })
+
+  if (!response.ok) throw new Error(`Slack API error: ${res.error}`)
+
   return response.data
 }
 
@@ -90,6 +93,10 @@ export async function emailToUserId(email) {
   return res.user.id
 }
 
+/**
+ * It makes a GET request to the Slack API, and returns the response as a JSON object.
+ * @returns A list of channels.
+ */
 export async function listConversations() {
   const config = {
     method: "get",
@@ -104,5 +111,7 @@ export async function listConversations() {
 
   if (!res.ok) throw new Error(`Slack API error: ${res.error}`)
 
-  return res.channels
+  return res.conversations
 }
+
+export async function inviteToChannel() {}
