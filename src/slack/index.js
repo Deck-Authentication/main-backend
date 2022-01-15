@@ -1,4 +1,5 @@
 import express from "express"
+import lodash from "lodash"
 let slackRouter = express.Router()
 import * as slackUtils from "./utils"
 // isEmail as a function from the main utils folder
@@ -43,6 +44,7 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
   // emails is an array of string
   const { emails, channelName } = req.body
 
+  // The Slack API only allows 1000 users to be invited at a time: https://api.slack.com/methods/conversations.invite#arg_channel
   if (emails.length > 1000)
     res.json(413).json({
       message: "Error: only up to 1000 emails can be invited each API call",
@@ -60,14 +62,24 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
       .catch((err) => res.status(406).json({ message: err.message }))
   }
 
-  // Get channel ID from channel name
-  const allChannels = await slackUtils
+  // Get all channels in the workspace, save into an object where keys are channel names
+  let allChannels = {}
+  await slackUtils
     .listConversations()
+    .then((channels) =>
+      channels.map(
+        (channel) => (allChannels[channel.name] = lodash.cloneDeep(channel))
+      )
+    )
     .catch((err) => res.status(500).json({ message: err }))
+
+  // for O(1) lookup, we should save all channels into an object
 
   const matchedChannel = allChannels.find(
     (channel) => channel.name === channelName && channel.is_channel
   )
+
+  // matchedChannels should be an array
 
   if (!matchedChannel)
     res.status(404).json({ message: `Channel ${channelName} not found` })
