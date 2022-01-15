@@ -71,14 +71,18 @@ export async function getServiceProviderConfigs() {
  * @returns The user ID of the user with the given email address.
  */
 export async function emailToUserId(email) {
-  const res = await axios({
+  console.log("email = ", email)
+
+  const config = {
     method: "get",
-    url: `${SLACK_API}/users.lookupByEmail`,
-    params: {
-      token: process.env.SLACK_ORG_ADMIN_USER_TOKEN,
-      email,
+    url: `${SLACK_API}/users.lookupByEmail?email=${email}`,
+    headers: {
+      Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+      Cookie: "b=394400ceb27cb8b995ced7ab7e2247bc",
     },
-  }).then((res) => res.data)
+  }
+
+  const res = await axios(config).then((res) => res.data)
 
   if (!res.ok) throw new Error(`Slack API error: ${res.error}`)
 
