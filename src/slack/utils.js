@@ -23,6 +23,9 @@ export async function getUser(id = "") {
   const url =
     id !== "" ? `${SLACK_SCIM_API}/Users/${id}` : `${SLACK_SCIM_API}/Users`
   const response = await axios.get(url, { headers: scimAuthHeaders })
+
+  if (!response.ok) throw new Error(`Slack API error: ${res.error}`)
+
   return response.data
 }
 

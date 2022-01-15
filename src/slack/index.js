@@ -14,9 +14,13 @@ slackRouter.get("/user/:email", async (req, res) => {
       .status(412)
       .json({ message: "Error: input must be a valid email address" })
 
-  const userId = await slackUtils.emailToUserId(email)
+  const userId = await slackUtils
+    .emailToUserId(email)
+    .catch((err) => res.status(406).json({ message: err.message }))
 
-  const user = await slackUtils.getUser(userId)
+  const user = await slackUtils
+    .getUser(userId)
+    .catch((err) => res.status(403).json({ message: err.message }))
 
   res.status(200).json({ user })
 })
@@ -36,7 +40,14 @@ slackRouter.get("/list-conversations", async (req, res) => {
 slackRouter.put("/invite-to-channel", async (req, res) => {
   const { email, channel } = req.body
 
-  const userId = await slackUtils.emailToUserId(email)
+  if (!isEmail(email))
+    res
+      .status(412)
+      .json({ message: "Error: input must be a valid email address" })
+
+  const userId = await slackUtils
+    .emailToUserId(email)
+    .catch((err) => res.status(406).json({ message: err.message }))
 
   const invite = await slackUtils.inviteToChannel(userId, channel)
 
