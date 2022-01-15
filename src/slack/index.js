@@ -38,18 +38,27 @@ slackRouter.get("/list-conversations", async (req, res) => {
 })
 
 slackRouter.put("/invite-to-channel", async (req, res) => {
-  // Assuming that there is no # sign in the channel name
+  // Assuming that there is no '#' sign in the channel name
   // This is an edge case that must be handled by the frontend
-  const { email, channelName } = req.body
+  // emails is an array of string
+  const { emails, channelName } = req.body
 
-  if (!isEmail(email))
-    res
-      .status(412)
-      .json({ message: "Error: input must be a valid email address" })
+  if (emails.length > 1000)
+    res.json(413).json({
+      message: "Error: only up to 1000 emails can be invited each API call",
+    })
 
-  const userId = await slackUtils
-    .emailToUserId(email)
-    .catch((err) => res.status(406).json({ message: err.message }))
+  let userIds = []
+
+  for (let email of emails) {
+    if (!isEmail(email))
+      res.status(412).json({ message: `Error: invalid email address ${email}` })
+
+    await slackUtils
+      .emailToUserId(email)
+      .then((userId) => userIds.push(userId))
+      .catch((err) => res.status(406).json({ message: err.message }))
+  }
 
   // Get channel ID from channel name
   const allChannels = await slackUtils
@@ -65,8 +74,10 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
 
   const channelId = matchedChannel.id
 
+  // join the array userIds to a comma-separated string of user IDs to comply with Slack standards
+  // Example: W1234567890,U2345678901,U3456789012
   const invitation = await slackUtils
-    .inviteToChannel(userId, channelId)
+    .inviteToChannel(userIds.join(), channelId)
     .catch((err) => res.status(500).json({ message: err }))
 
   res.status(200).json({ invitation })
