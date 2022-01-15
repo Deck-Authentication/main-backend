@@ -6,10 +6,14 @@ slackRouter.get("/port", (req, res) => {
   res.status(200).send(`PORT = ${process.env.PORT || "No Port found"}`)
 })
 
-slackRouter.get("/user/:id", async (req, res) => {
-  const id = req.params.id
-  console.log("id = ", id)
-  const user = await slackUtils.getUser(id)
+/**
+ * Get the user ID for a given email address, then get the user object for that ID.
+ */
+slackRouter.get("/user/:email", async (req, res) => {
+  const email = req.params.email
+  const userId = await slackUtils.emailToUserId(email)
+
+  const user = await slackUtils.getUser(userId)
 
   res.status(200).json({ user })
 })
