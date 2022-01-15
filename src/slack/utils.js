@@ -93,6 +93,10 @@ export async function emailToUserId(email) {
   return res.user.id
 }
 
+/**
+ * It makes a GET request to the Slack API, and returns the response as a JSON object.
+ * @returns A list of channels.
+ */
 export async function listConversations() {
   const config = {
     method: "get",
@@ -107,5 +111,7 @@ export async function listConversations() {
 
   if (!res.ok) throw new Error(`Slack API error: ${res.error}`)
 
-  return res.channels
+  return res.conversations
 }
+
+export async function inviteToChannel() {}

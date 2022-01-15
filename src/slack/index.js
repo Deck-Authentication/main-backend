@@ -38,7 +38,9 @@ slackRouter.get("/list-conversations", async (req, res) => {
 })
 
 slackRouter.put("/invite-to-channel", async (req, res) => {
-  const { email, channel } = req.body
+  // Assuming that there is no # sign in the channel name
+  // This is an edge case that must be handled by the frontend
+  const { email, channelName } = req.body
 
   if (!isEmail(email))
     res
@@ -49,9 +51,25 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
     .emailToUserId(email)
     .catch((err) => res.status(406).json({ message: err.message }))
 
-  const invite = await slackUtils.inviteToChannel(userId, channel)
+  // Get channel ID from channel name
+  const allChannels = await slackUtils
+    .listConversations()
+    .catch((err) => res.status(500).json({ message: err }))
 
-  res.status(200).json({ invite })
+  const matchedChannel = allChannels.find(
+    (channel) => channel.name === channelName
+  )
+
+  if (!matchedChannel)
+    res.status(404).json({ message: `Channel ${channelName} not found` })
+
+  const channelId = matchedChannel.id
+
+  const invitation = await slackUtils
+    .inviteToChannel(userId, channelId)
+    .catch((err) => res.status(500).json({ message: err }))
+
+  res.status(200).json({ invitation })
 })
 
 // slackRouter.use((error, req, res, next) => {
