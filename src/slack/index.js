@@ -57,7 +57,7 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
     .catch((err) => res.status(500).json({ message: err }))
 
   const matchedChannel = allChannels.find(
-    (channel) => channel.name === channelName
+    (channel) => channel.name === channelName && channel.is_channel
   )
 
   if (!matchedChannel)
