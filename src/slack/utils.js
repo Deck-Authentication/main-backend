@@ -117,4 +117,23 @@ export async function listConversations() {
   return response.channels
 }
 
-export async function inviteToChannel() {}
+export async function inviteToChannel(userIds = "", channelId = "") {
+  const config = {
+    method: "get",
+    url: `${SLACK_API}/conversations.invite`,
+    headers: {
+      Authorization: `Bearer ${process.env.SLACK_ORG_ADMIN_USER_TOKEN}`,
+      Cookie: "b=394400ceb27cb8b995ced7ab7e2247bc",
+    },
+    params: {
+      channel: channelId,
+      users: userIds,
+    },
+  }
+
+  const response = await axios(config).then((res) => res.data)
+
+  if (!response.ok) throw new Error(`Slack API error: ${response.error}`)
+
+  return response.channel
+}
