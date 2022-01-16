@@ -104,11 +104,35 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
 
 slackRouter.post("/remove-from-channel", async (req, res) => {
   // hardcode userId and channelId for now to test the removeFromChannel function
-  const userId = "U02T197H7GW"
-  const channelId = "C02TU600VEF"
+  let { email, channel } = req.body
+
+  // sanitize email
+  email = email.trim().toLowerCase()
+
+  if (!isEmail(email))
+    res.status(412).json({ message: `Error: invalid email address ${email}` })
+
+  const userId = await slackUtils
+    .emailToUserId(email)
+    .catch((err) => res.status(406).json({ message: err.message }))
+
+  const matchedChannel = await slackUtils
+    .listConversations()
+    .then((channels) =>
+      channels.find((channelObj) => channelObj.name === channel)
+    )
+    .catch((err) => res.status(500).json({ message: err }))
+
+  if (!matchedChannel)
+    res.status(404).json({ message: `Channel ${channel} not found` })
+
   await slackUtils
-    .removeFromChannel(userId, channelId)
-    .then((_) => res.status(200).json({ message: "Removed" }))
+    .removeFromChannel(userId, matchedChannel.id)
+    .then((_) =>
+      res.status(200).json({
+        message: `Successfully removed account ${email} from channel ${channel}`,
+      })
+    )
     .catch((error) => res.status(500).json({ message: error }))
 })
 
