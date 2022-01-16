@@ -133,7 +133,10 @@ export async function inviteToChannel(userIds = "", channelId = "") {
 
   const response = await axios(config).then((res) => res.data)
 
-  if (!response.ok) throw new Error(`Slack API error: ${response.error}`)
+  if (!response.ok)
+    throw new Error(
+      `Slack API error with userIds ${userIds} and channelId ${channelId}: ${response.error}`
+    )
 
   return response.channel
 }
