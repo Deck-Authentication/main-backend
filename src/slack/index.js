@@ -102,6 +102,16 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
     })
 })
 
+slackRouter.post("/remove-from-channel", async (req, res) => {
+  // hardcode userId and channelId for now to test the removeFromChannel function
+  const userId = "U02T197H7GW"
+  const channelId = "C02TU600VEF"
+  await slackUtils
+    .removeFromChannel(userId, channelId)
+    .then((_) => res.status(200).json({ message: "Removed" }))
+    .catch((error) => res.status(500).json({ message: error }))
+})
+
 // slackRouter.use((error, req, res, next) => {
 //   res.status(500).json({ error })
 // })
