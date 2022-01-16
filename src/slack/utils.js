@@ -119,7 +119,7 @@ export async function listConversations() {
 
 export async function inviteToChannel(userIds = "", channelId = "") {
   const config = {
-    method: "get",
+    method: "post",
     url: `${SLACK_API}/conversations.invite`,
     headers: {
       Authorization: `Bearer ${process.env.SLACK_ORG_ADMIN_USER_TOKEN}`,
@@ -139,4 +139,28 @@ export async function inviteToChannel(userIds = "", channelId = "") {
     )
 
   return response.channel
+}
+
+export async function removeFromChannel(userId = "", channelId = "") {
+  const config = {
+    method: "post",
+    url: `${SLACK_API}/conversations.kick`,
+    headers: {
+      Authorization: `Bearer ${process.env.SLACK_ORG_ADMIN_USER_TOKEN}`,
+      Cookie: "b=394400ceb27cb8b995ced7ab7e2247bc",
+    },
+    params: {
+      channel: channelId,
+      user: userId,
+    },
+  }
+
+  const response = await axios(config).then((res) => res.data)
+
+  if (!response.ok)
+    throw new Error(
+      `Slack API error: removeFromChannel with userId ${userId} and channelId ${channelId}: ${response.error}`
+    )
+
+  return { message: "Successfully removed user from channel" }
 }
