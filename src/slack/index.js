@@ -103,37 +103,57 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
 })
 
 slackRouter.post("/remove-from-channel", async (req, res) => {
-  // hardcode userId and channelId for now to test the removeFromChannel function
-  let { email, channel } = req.body
+  let { emails, channels } = req.body
+  let userIds = []
+  for (let i = 0; i < emails.length; i++) {
+    // sanitize email
+    emails[i] = emails[i].trim().toLowerCase()
+    if (!isEmail(emails[i]))
+      res
+        .status(412)
+        .json({ message: `Error: invalid email address ${emails[i]}` })
 
-  // sanitize email
-  email = email.trim().toLowerCase()
+    await slackUtils
+      .emailToUserId(emails[i])
+      .then((userId) => userIds.push(userId))
+      .catch((err) => res.status(406).json({ message: err.message }))
+  }
 
-  if (!isEmail(email))
-    res.status(412).json({ message: `Error: invalid email address ${email}` })
-
-  const userId = await slackUtils
-    .emailToUserId(email)
-    .catch((err) => res.status(406).json({ message: err.message }))
-
-  const matchedChannel = await slackUtils
+  let allChannels = {}
+  await slackUtils
     .listConversations()
-    .then((channels) =>
-      channels.find((channelObj) => channelObj.name === channel)
+    .then((channelsObj) =>
+      channelsObj.map(
+        (channel) => (allChannels[channel.name] = lodash.cloneDeep(channel))
+      )
     )
     .catch((err) => res.status(500).json({ message: err }))
 
-  if (!matchedChannel)
-    res.status(404).json({ message: `Channel ${channel} not found` })
+  let matchedChannels = []
+  channels.map(
+    (channelName) =>
+      allChannels.hasOwnProperty(channelName) &&
+      matchedChannels.push(allChannels[channelName])
+  )
 
-  await slackUtils
-    .removeFromChannel(userId, matchedChannel.id)
-    .then((_) =>
-      res.status(200).json({
-        message: `Successfully removed account ${email} from channel ${channel}`,
-      })
-    )
-    .catch((error) => res.status(500).json({ message: error }))
+  if (!matchedChannels.length)
+    res.status(404).json({ message: `Channel ${channelName} not found` })
+
+  const channelIds = matchedChannels.map((matchedChannel) => matchedChannel.id)
+
+  const invitations = []
+  for (let userId of userIds) {
+    for (let channelId of channelIds) {
+      invitations.push(slackUtils.removeFromChannel(userId, channelId))
+    }
+  }
+
+  Promise.all(invitations)
+    .then((_) => res.status(200).json({ message: "Remove successfully" }))
+    .catch((err) => {
+      console.log("There is an error: ", err)
+      res.status(500).json({ message: err })
+    })
 })
 
 // slackRouter.use((error, req, res, next) => {
