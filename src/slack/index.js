@@ -64,8 +64,6 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
       .catch((err) => res.status(406).json({ message: err.message }))
   }
 
-  // Get all channels in the workspace, save into an object where keys are channel names
-  // for O(1) lookup, we save all channels into an object
   let allChannels = {}
   await slackUtils
     .listConversations()
@@ -79,8 +77,8 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
   let matchedChannels = []
   channels.map(
     (channelName) =>
-      matchChannel.hasOwnProperty(channelName) &&
-      matchedChannels.push(matchChannel[channelName])
+      allChannels.hasOwnProperty(channelName) &&
+      matchedChannels.push(allChannels[channelName])
   )
 
   if (!matchedChannels.length)
@@ -90,11 +88,18 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
 
   // join the array userIds to a comma-separated string of user IDs to comply with Slack standards
   // Example: W1234567890,U2345678901,U3456789012
-  const invitation = await slackUtils
-    .inviteToChannel(userIds.join(), channelIds)
-    .catch((err) => res.status(500).json({ message: err }))
+  userIds = userIds.join(",")
 
-  res.status(200).json({ invitation })
+  const invitations = channelIds.map((channelId) =>
+    slackUtils.inviteToChannel(userIds, channelId)
+  )
+
+  Promise.all(invitations)
+    .then((_) => res.status(200).json({ message: "Invitations sent" }))
+    .catch((err) => {
+      console.log("There is an error: ", err)
+      res.status(500).json({ message: err })
+    })
 })
 
 // slackRouter.use((error, req, res, next) => {
