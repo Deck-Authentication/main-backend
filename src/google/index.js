@@ -4,6 +4,12 @@ import queryString from "query-string"
 import path from "path"
 import url from "url"
 
+const scopes = [
+  "https://www.googleapis.com/auth/admin.directory.group",
+  "https://www.googleapis.com/auth/admin.directory.group.member",
+  "https://www.googleapis.com/auth/admin.directory.user.security",
+]
+
 const googleRouter = Router()
 
 googleRouter.post("/create-group", async (req, res) => {})
