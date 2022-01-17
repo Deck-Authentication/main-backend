@@ -1,5 +1,6 @@
 import express from "express"
 import slackRouter from "./slack"
+import googleRouter from "./google"
 import cors from "cors"
 const app = express()
 
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/slack", slackRouter)
+app.use("/google", googleRouter)
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
