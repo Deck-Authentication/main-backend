@@ -16,7 +16,7 @@ groupRouter.post("/delete-group", async (req, res) => {})
 
 groupRouter.get("/get-group", async (req, res) => {})
 
-groupRouter.get("/add-member", async (req, res) => {
+groupRouter.post("/add-member", async (req, res) => {
   // groupKeys is an array of group emails, while members is an array of objects in the form { email: "", role: "" }
   const { groupKeys, members } = req.body
 
@@ -40,6 +40,25 @@ groupRouter.get("/add-member", async (req, res) => {
     .catch((err) => res.status(500).json({ message: err }))
 })
 
-groupRouter.get("/remove-member", async (req, res) => {})
+groupRouter.delete("/remove-member", async (req, res) => {
+  // groupKeys is an array of group emails, while members is an array of user emails
+  const { groupKeys, members } = req.body
+
+  let promises = []
+  for (let groupKey of groupKeys) {
+    for (let member of members) {
+      promises.push(
+        admin.members.delete({
+          groupKey,
+          memberKey: member,
+        })
+      )
+    }
+  }
+
+  Promise.all(promises)
+    .then((_) => res.status(200).json({ message: "success" }))
+    .catch((err) => res.status(500).json({ message: err }))
+})
 
 export default groupRouter
