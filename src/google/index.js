@@ -25,6 +25,14 @@ const jwtKey = {
     "https://www.googleapis.com/robot/v1/metadata/x509/deck-jwt%40workspace-admin-deck.iam.gserviceaccount.com",
 }
 
+const auth = new google.auth.JWT(
+  key.client_email,
+  null,
+  key.private_key,
+  scopes,
+  authEmail
+)
+
 const googleRouter = Router()
 
 googleRouter.post("/create-group", async (req, res) => {})
