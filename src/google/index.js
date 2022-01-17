@@ -33,6 +33,11 @@ const auth = new google.auth.JWT(
   authEmail
 )
 
+// obtain the admin client
+const admin = google.admin({
+  version: "directory_v1",
+  auth,
+})
 const googleRouter = Router()
 
 googleRouter.post("/create-group", async (req, res) => {})
