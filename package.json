@@ -16,7 +16,9 @@
     "dotenv": "^11.0.0",
     "esm": "^3.2.25",
     "express": "^4.17.2",
+    "googleapis": "^92.0.0",
     "lodash": "^4.17.21",
-    "mongoose": "^6.1.6"
+    "mongoose": "^6.1.6",
+    "query-string": "^7.1.0"
   }
 }
