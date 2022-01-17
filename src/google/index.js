@@ -9,7 +9,7 @@ const scopes = [
   "https://www.googleapis.com/auth/admin.directory.group.member",
   "https://www.googleapis.com/auth/admin.directory.user.security",
 ]
-
+const authEmail = "peter@withdeck.com"
 const jwtKey = {
   type: "service_account",
   project_id: "workspace-admin-deck",
@@ -26,9 +26,9 @@ const jwtKey = {
 }
 
 const auth = new google.auth.JWT(
-  key.client_email,
+  jwtKey.client_email,
   null,
-  key.private_key,
+  jwtKey.private_key,
   scopes,
   authEmail
 )
