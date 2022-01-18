@@ -1,4 +1,4 @@
-import { response, Router } from "express"
+import { Router } from "express"
 import { Octokit } from "octokit"
 import { config } from "dotenv"
 // load environment variables from .env file

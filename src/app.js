@@ -2,6 +2,7 @@ import express from "express"
 import slackRouter from "./slack"
 import googleRouter from "./google"
 import githubRouter from "./github"
+import atlassianRouter from "./atlassian"
 import cors from "cors"
 const app = express()
 
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 app.use("/slack", slackRouter)
 app.use("/google", googleRouter)
 app.use("/github", githubRouter)
+app.use("/atlassian", atlassianRouter)
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
