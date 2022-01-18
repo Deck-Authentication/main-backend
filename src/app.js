@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/slack", slackRouter)
 app.use("/google", googleRouter)
+app.use("/github", githubRouter)
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)

@@ -1,6 +1,6 @@
-import { Route } from "express"
+import { Router } from "express"
 
-const githubRouter = Route()
+const githubRouter = Router()
 
 githubRouter.post("/invite-to-team", (req, res) => {})
 
