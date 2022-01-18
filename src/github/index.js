@@ -52,24 +52,44 @@ githubRouter.post("/invite-to-team", async (req, res) => {
 })
 
 githubRouter.delete("/remove-from-team", async (req, res) => {
-  const { username, team_slug, org } = req.body
-  await octokit
-    .request("DELETE /orgs/:org/teams/:team_slug/memberships/:username", {
-      org,
-      team_slug,
-      username,
+  const { usernames, team_slugs, org } = req.body
+
+  let removals = []
+
+  team_slugs.map((team_slug) => {
+    usernames.map((username) =>
+      removals.push(
+        octokit.request(
+          "DELETE /orgs/:org/teams/:team_slug/memberships/:username",
+          {
+            org,
+            team_slug,
+            username,
+          }
+        )
+      )
+    )
+  })
+
+  await Promise.all(removals)
+    .then((responses) => {
+      responses.map((response) => {
+        if (response.status != 200 && response.status != 204)
+          res.status(500).json({
+            message: `Request failed`,
+            responseStatus: response.status,
+          })
+      })
+
+      res.status(200).json({
+        message: `Remove successfully`,
+      })
     })
-    .then((response) => {
-      if (response.status == 204)
-        res.status(200).json({
-          message: `Successfully remove ${username} from ${team_slug}`,
-        })
-      else
-        res.status(500).json({
-          message: `Request failed with the Github status ${response.status}`,
-        })
-    })
-    .catch((err) => res.status(500).json({ message: err.message }))
+    .catch((err) =>
+      res
+        .status(500)
+        .json({ message: "Request failed from Github", error: err })
+    )
 })
 
 githubRouter.post("/create-team", (req, res) => {})
