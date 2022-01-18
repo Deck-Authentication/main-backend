@@ -1,6 +1,7 @@
 import express from "express"
 import slackRouter from "./slack"
 import googleRouter from "./google"
+import githubRouter from "./github"
 import cors from "cors"
 const app = express()
 
