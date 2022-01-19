@@ -1,5 +1,19 @@
 import { Router } from "express"
-import { findUser } from "./jiraUtil"
+import { findUser } from "./jiraUtils"
+import { config } from "dotenv"
+import { Version2Client } from "jira.js"
+// load environment variables from .env file
+config()
+
+const jiraClient = new Version2Client({
+  host: process.env.ATLASSIAN_HOST,
+  authentication: {
+    basic: {
+      email: process.env.ATLASSIAN_EMAIL,
+      apiToken: process.env.ATLASSIAN_API_TOKEN,
+    },
+  },
+})
 
 const jiraRouter = Router()
 
@@ -7,7 +21,39 @@ jiraRouter.post("/create-team", async (req, res) => {})
 
 jiraRouter.delete("/delete-team", async (req, res) => {})
 
-jiraRouter.post("/invite-to-team", async (req, res) => {})
+jiraRouter.post("/invite-to-team", async (req, res) => {
+  const { groupnames, emails } = req.body
+
+  const usersPromises = emails.map((email) => findUser(email))
+
+  const users = await Promise.all(usersPromises).catch((err) =>
+    res.status(500).send(err)
+  )
+
+  let promises = []
+
+  groupnames.map((groupname) => {
+    users.map((user) => {
+      promises.push(
+        jiraClient.groups.addUserToGroup({
+          groupname: groupname,
+          accountId: user.accountId,
+        })
+      )
+    })
+  })
+
+  await Promise.all(promises)
+    .then(() => res.status(200).json({ message: "Success!" }))
+    .catch((err) => res.status(500).send(err))
+})
+
+jiraRouter.get("/get-all-groups", async (_, res) => {
+  await jiraClient.groups
+    .findGroups()
+    .then((groups) => res.status(200).send(groups))
+    .catch((err) => res.status(500).send(err))
+})
 
 jiraRouter.delete("/remove-from-team", async (req, res) => {})
 
