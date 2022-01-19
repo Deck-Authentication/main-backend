@@ -27,5 +27,8 @@ export async function findUser(email) {
     .catch((err) => {
       throw new Error(err)
     })
+
+  if (!users.length) throw new Error(`No user found with email ${email}`)
+
   return users[0]
 }
