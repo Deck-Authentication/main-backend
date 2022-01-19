@@ -44,7 +44,9 @@ jiraRouter.post("/invite-to-team", async (req, res) => {
   })
 
   await Promise.all(promises)
-    .then(() => res.status(200).json({ message: "Success!" }))
+    .then(() =>
+      res.status(200).json({ message: "Successfully invite users to groups" })
+    )
     .catch((err) => res.status(500).send(err))
 })
 
@@ -55,7 +57,34 @@ jiraRouter.get("/get-all-groups", async (_, res) => {
     .catch((err) => res.status(500).send(err))
 })
 
-jiraRouter.delete("/remove-from-team", async (req, res) => {})
+jiraRouter.delete("/remove-from-team", async (req, res) => {
+  const { groupnames, emails } = req.body
+
+  const usersPromises = emails.map((email) => findUser(email))
+
+  const users = await Promise.all(usersPromises).catch((err) =>
+    res.status(500).send(err)
+  )
+
+  let promises = []
+
+  groupnames.map((groupname) => {
+    users.map((user) => {
+      promises.push(
+        jiraClient.groups.removeUserFromGroup({
+          groupname: groupname,
+          accountId: user.accountId,
+        })
+      )
+    })
+  })
+
+  await Promise.all(promises)
+    .then(() =>
+      res.status(200).json({ message: "Successfully remove users from groups" })
+    )
+    .catch((err) => res.status(500).send(err))
+})
 
 // This route is for testing purposes only
 jiraRouter.get("/get-projects", async (req, res) => {
