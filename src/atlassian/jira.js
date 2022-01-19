@@ -1,19 +1,5 @@
 import { Router } from "express"
-import { config } from "dotenv"
-import { Version2Client } from "jira.js"
-
-// load environment variables from .env file
-config()
-
-const jiraClient = new Version2Client({
-  host: process.env.ATLASSIAN_HOST,
-  authentication: {
-    basic: {
-      email: process.env.ATLASSIAN_EMAIL,
-      apiToken: process.env.ATLASSIAN_API_TOKEN,
-    },
-  },
-})
+import { findUser } from "./jiraUtil"
 
 const jiraRouter = Router()
 
