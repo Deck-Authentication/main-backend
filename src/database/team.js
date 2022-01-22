@@ -5,6 +5,7 @@ const member = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // Object Id of the members. This is helpful for searching
   objectId: {
     type: String,
     required: true,
