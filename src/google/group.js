@@ -27,8 +27,9 @@ groupRouter.post("/add-member", async (req, res) => {
         admin.members.insert({
           groupKey,
           resource: {
-            email: member.email,
-            role: member.role,
+            email: member,
+            // you can add roles here, but will include them later
+            // role: member.role,
           },
         })
       )

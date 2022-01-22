@@ -102,7 +102,7 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
     })
 })
 
-slackRouter.post("/remove-from-channel", async (req, res) => {
+slackRouter.delete("/remove-from-channel", async (req, res) => {
   let { emails, channels } = req.body
   let userIds = []
   for (let i = 0; i < emails.length; i++) {
