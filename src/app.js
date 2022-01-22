@@ -4,11 +4,14 @@ import googleRouter from "./google"
 import githubRouter from "./github"
 import atlassianRouter from "./atlassian"
 import cors from "cors"
+import { connectDB } from "./database"
 const app = express()
 
 require("dotenv").config()
 
 const port = process.env.PORT || 1999
+
+connectDB.call(this)
 
 app.use(cors())
 app.use(express.json())
