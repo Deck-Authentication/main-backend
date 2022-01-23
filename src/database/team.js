@@ -6,7 +6,7 @@ const member = new mongoose.Schema({
     required: true,
   },
   // Object Id of the members. This is helpful for searching
-  objectId: {
+  referenceId: {
     type: String,
     required: true,
   },
@@ -16,7 +16,7 @@ export const TeamSchema = new mongoose.Schema(
   {
     app: {
       slack: {
-        channel: [String],
+        channels: [String],
       },
       google: {
         groupKeys: [String],
