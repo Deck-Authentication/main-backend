@@ -1,8 +1,8 @@
 import express from "express"
-import slackRouter from "./slack"
-import googleRouter from "./google"
-import githubRouter from "./github"
-import atlassianRouter from "./atlassian"
+import slackRouter from "./integrations/slack"
+import googleRouter from "./integrations/google"
+import githubRouter from "./integrations/github"
+import atlassianRouter from "./integrations/atlassian"
 import cors from "cors"
 import { connectDB } from "./database"
 const app = express()
@@ -20,6 +20,8 @@ app.use(express.urlencoded({ extended: false }))
 app.get("/", (req, res) => {
   res.send("Hello World!")
 })
+
+app.use("/team", teamRouter)
 
 app.use("/slack", slackRouter)
 app.use("/google", googleRouter)
