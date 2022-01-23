@@ -3,7 +3,7 @@ import lodash from "lodash"
 let slackRouter = express.Router()
 import * as slackUtils from "./utils"
 // isEmail as a function from the main utils folder
-import { isEmail } from "../utils"
+import { isEmail } from "../../utils"
 
 /**
  * Get the user ID for a given email address, then get the user object for that ID.
