@@ -3,6 +3,7 @@ import slackRouter from "./integrations/slack"
 import googleRouter from "./integrations/google"
 import githubRouter from "./integrations/github"
 import atlassianRouter from "./integrations/atlassian"
+import teamRouter from "./team"
 import cors from "cors"
 import { connectDB } from "./database"
 const app = express()
