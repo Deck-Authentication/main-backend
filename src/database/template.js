@@ -12,7 +12,7 @@ const member = new mongoose.Schema({
   },
 })
 
-export const TeamSchema = new mongoose.Schema(
+export const TemplateSchema = new mongoose.Schema(
   {
     app: {
       slack: {
@@ -28,7 +28,7 @@ export const TeamSchema = new mongoose.Schema(
     name: String,
     member: [member],
   },
-  { collection: "team" }
+  { collection: "template" }
 )
 
-export const Team = mongoose.model("team", TeamSchema)
+export const Template = mongoose.model("template", TemplateSchema)
