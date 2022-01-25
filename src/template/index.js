@@ -11,9 +11,9 @@ templateRouter.get("/get-all-template", async (_, res) => {
     .catch((err) => res.status(500).json({ message: err, ok: false }))
 })
 
-templateRouter.get("/get-template-by-id", async (req, res) => {
+templateRouter.get("/get-template-by-id/:id", async (req, res) => {
   if (!req.params.id)
-    res.status(400).json({ message: "id is required", ok: false })
+    return res.status(400).json({ message: "id is required", ok: false })
 
   // cast the req.params.id to MongoDB ObjectId type to avoid invalid id error from mongoose
   const _id = mongoose.Types.ObjectId(req.params.id)
