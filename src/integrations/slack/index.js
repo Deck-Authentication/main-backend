@@ -10,18 +10,11 @@ import { isEmail } from "../../utils"
  */
 slackRouter.get("/user/:email", async (req, res) => {
   const email = req.params.email
-  if (!isEmail(email))
-    res
-      .status(412)
-      .json({ message: "Error: input must be a valid email address" })
+  if (!isEmail(email)) res.status(412).json({ message: "Error: input must be a valid email address" })
 
-  const userId = await slackUtils
-    .emailToUserId(email)
-    .catch((err) => res.status(406).json({ message: err.message }))
+  const userId = await slackUtils.emailToUserId(email).catch((err) => res.status(406).json({ message: err.message }))
 
-  const user = await slackUtils
-    .getUser(userId)
-    .catch((err) => res.status(403).json({ message: err.message }))
+  const user = await slackUtils.getUser(userId).catch((err) => res.status(403).json({ message: err.message }))
 
   res.status(200).json({ user })
 })
@@ -32,7 +25,7 @@ slackRouter.get("/service-provider-configs", async (req, res) => {
   res.status(200).json({ serviceProviderConfigs })
 })
 
-slackRouter.get("/list-conversations", async (req, res) => {
+slackRouter.get("/list-conversations", async (_, res) => {
   const conversations = await slackUtils.listConversations()
 
   res.status(200).json({ conversations })
@@ -49,14 +42,14 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
     res.json(413).json({
       message: "Error: only up to 1000 emails can be invited each API call",
     })
-  else if (emails.length <= 0)
-    res.json(417).json({ message: "Error: no emails were provided" })
+  else if (emails.length <= 0) res.json(417).json({ message: "Error: no emails were provided" })
 
   let userIds = []
 
   for (let email of emails) {
-    if (!isEmail(email))
-      res.status(412).json({ message: `Error: invalid email address ${email}` })
+    if (!isEmail(email)) {
+      return res.status(412).json({ message: `Error: invalid email address ${email}` })
+    }
 
     await slackUtils
       .emailToUserId(email)
@@ -67,22 +60,13 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
   let allChannels = {}
   await slackUtils
     .listConversations()
-    .then((channelsObj) =>
-      channelsObj.map(
-        (channel) => (allChannels[channel.name] = lodash.cloneDeep(channel))
-      )
-    )
+    .then((channelsObj) => channelsObj.map((channel) => (allChannels[channel.name] = lodash.cloneDeep(channel))))
     .catch((err) => res.status(500).json({ message: err }))
 
   let matchedChannels = []
-  channels.map(
-    (channelName) =>
-      allChannels.hasOwnProperty(channelName) &&
-      matchedChannels.push(allChannels[channelName])
-  )
+  channels.map((channelName) => allChannels.hasOwnProperty(channelName) && matchedChannels.push(allChannels[channelName]))
 
-  if (!matchedChannels.length)
-    res.status(404).json({ message: `Channel ${channelName} not found` })
+  if (!matchedChannels.length) res.status(404).json({ message: `Channel ${channelName} not found` })
 
   const channelIds = matchedChannels.map((matchedChannel) => matchedChannel.id)
 
@@ -90,9 +74,7 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
   // Example: W1234567890,U2345678901,U3456789012
   userIds = userIds.join(",")
 
-  const invitations = channelIds.map((channelId) =>
-    slackUtils.inviteToChannel(userIds, channelId)
-  )
+  const invitations = channelIds.map((channelId) => slackUtils.inviteToChannel(userIds, channelId))
 
   Promise.all(invitations)
     .then((_) => res.status(200).json({ message: "Invitations sent" }))
@@ -102,16 +84,14 @@ slackRouter.put("/invite-to-channel", async (req, res) => {
     })
 })
 
-slackRouter.delete("/remove-from-channel", async (req, res) => {
+slackRouter.delete("/remove-from-channels", async (req, res) => {
   let { emails, channels } = req.body
+
   let userIds = []
   for (let i = 0; i < emails.length; i++) {
     // sanitize email
     emails[i] = emails[i].trim().toLowerCase()
-    if (!isEmail(emails[i]))
-      res
-        .status(412)
-        .json({ message: `Error: invalid email address ${emails[i]}` })
+    if (!isEmail(emails[i])) res.status(412).json({ message: `Error: invalid email address ${emails[i]}` })
 
     await slackUtils
       .emailToUserId(emails[i])
@@ -122,22 +102,15 @@ slackRouter.delete("/remove-from-channel", async (req, res) => {
   let allChannels = {}
   await slackUtils
     .listConversations()
-    .then((channelsObj) =>
-      channelsObj.map(
-        (channel) => (allChannels[channel.name] = lodash.cloneDeep(channel))
-      )
-    )
+    .then((channelsObj) => channelsObj.map((channel) => (allChannels[channel.name] = lodash.cloneDeep(channel))))
     .catch((err) => res.status(500).json({ message: err }))
 
   let matchedChannels = []
-  channels.map(
-    (channelName) =>
-      allChannels.hasOwnProperty(channelName) &&
-      matchedChannels.push(allChannels[channelName])
-  )
+  channels.map((channelName) => allChannels.hasOwnProperty(channelName) && matchedChannels.push(allChannels[channelName]))
 
-  if (!matchedChannels.length)
-    res.status(404).json({ message: `Channel ${channelName} not found` })
+  if (!matchedChannels.length) {
+    res.status(404).json({ message: `Channel not found` })
+  }
 
   const channelIds = matchedChannels.map((matchedChannel) => matchedChannel.id)
 

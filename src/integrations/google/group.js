@@ -14,7 +14,23 @@ groupRouter.post("/create-group", async (req, res) => {})
 
 groupRouter.post("/delete-group", async (req, res) => {})
 
-groupRouter.get("/get-group", async (req, res) => {})
+groupRouter.get("/list-all-groups", async (req, res) => {
+  // Hard code the userKey as email address for now
+  // since we don't have the user authentication flow on the frontend yet
+  const email = "peter@withdeck.com"
+
+  await admin.groups
+    .list({
+      userKey: email,
+    })
+    .then((response) => {
+      res.status(200).json({
+        groups: response.data.groups,
+        ok: true,
+      })
+    })
+    .catch((err) => res.status(500).json({ message: err, ok: false }))
+})
 
 groupRouter.post("/add-member", async (req, res) => {
   // groupKeys is an array of group emails, while members is an array of objects in the form { email: "", role: "" }
