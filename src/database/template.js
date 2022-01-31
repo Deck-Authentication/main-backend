@@ -26,7 +26,7 @@ export const TemplateSchema = new mongoose.Schema(
       },
     },
     name: String,
-    member: [member],
+    members: [member],
   },
   { collection: "template" }
 )

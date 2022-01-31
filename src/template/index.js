@@ -1,6 +1,7 @@
 import { Router } from "express"
 import { Template } from "../database/template"
 import mongoose from "mongoose"
+import updateRouter from "./update"
 
 const templateRouter = Router()
 
@@ -31,10 +32,10 @@ templateRouter.get("/get-template-by-id/:id", async (req, res) => {
     .catch((err) => res.status(500).json({ message: err, ok: false }))
 })
 
-templateRouter.post("/create-team", (req, res) => {})
+templateRouter.post("/create-template", (req, res) => {})
 
-templateRouter.delete("/remove-team", (req, res) => {})
+templateRouter.delete("/remove-template", (req, res) => {})
 
-templateRouter.put("/update-team", (req, res) => {})
+templateRouter.put("/update-template", updateRouter)
 
 export default templateRouter
