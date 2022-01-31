@@ -13,8 +13,7 @@ templateRouter.get("/get-all-template", async (_, res) => {
 })
 
 templateRouter.get("/get-template-by-id/:id", async (req, res) => {
-  if (!req.params.id)
-    return res.status(400).json({ message: "id is required", ok: false })
+  if (!req.params.id) return res.status(400).json({ message: "id is required", ok: false })
 
   // cast the req.params.id to MongoDB ObjectId type to avoid invalid id error from mongoose
   const _id = mongoose.Types.ObjectId(req.params.id)
@@ -36,6 +35,6 @@ templateRouter.post("/create-template", (req, res) => {})
 
 templateRouter.delete("/remove-template", (req, res) => {})
 
-templateRouter.put("/update-template", updateRouter)
+templateRouter.use("/update-template", updateRouter)
 
 export default templateRouter
