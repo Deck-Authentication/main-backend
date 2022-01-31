@@ -32,7 +32,7 @@ groupRouter.get("/list-all-groups", async (req, res) => {
     .catch((err) => res.status(500).json({ message: err, ok: false }))
 })
 
-groupRouter.post("/add-member", async (req, res) => {
+groupRouter.post("/add-members", async (req, res) => {
   // groupKeys is an array of group emails, while members is an array of objects in the form { email: "", role: "" }
   const { groupKeys, members } = req.body
 
