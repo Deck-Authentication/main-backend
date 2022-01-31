@@ -56,7 +56,7 @@ groupRouter.post("/add-member", async (req, res) => {
     .catch((err) => res.status(500).json({ message: err }))
 })
 
-groupRouter.delete("/remove-member", async (req, res) => {
+groupRouter.delete("/remove-members", async (req, res) => {
   // groupKeys is an array of group emails, while members is an array of user emails
   const { groupKeys, members } = req.body
 
