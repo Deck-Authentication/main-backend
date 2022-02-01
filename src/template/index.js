@@ -31,7 +31,16 @@ templateRouter.get("/get-template-by-id/:id", async (req, res) => {
     .catch((err) => res.status(500).json({ message: err, ok: false }))
 })
 
-templateRouter.post("/create-template", (req, res) => {})
+templateRouter.post("/create-template", async (req, res) => {
+  const { name } = req.body
+  if (name.trim().length === 0) return res.status(400).json({ message: "name is required as a nonempty string", ok: false })
+
+  // Must check for duplicate template name here. Will do later.
+
+  const template = await Template.create({ name }).catch((err) => res.status(500).json({ message: err, ok: false }))
+
+  return res.status(200).json({ template, message: "The template has been created", ok: true })
+})
 
 templateRouter.delete("/remove-template", (req, res) => {})
 
