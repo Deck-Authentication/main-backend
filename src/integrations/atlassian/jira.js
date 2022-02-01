@@ -26,7 +26,10 @@ jiraRouter.post("/invite-to-team", async (req, res) => {
 
   const usersPromises = emails.map((email) => findUser(email))
 
-  const users = await Promise.all(usersPromises).catch((err) => res.status(500).send(err))
+  const users = await Promise.all(usersPromises).catch((err) => {
+    console.log(err)
+    res.status(500).send(err)
+  })
 
   let promises = []
 

@@ -119,4 +119,43 @@ updateTemplateRouter.put("/app/google", async (req, res) => {
     .catch((err) => res.status(500).json({ message: err, ok: false }))
 })
 
+updateTemplateRouter.put("/app/atlassian", async (req, res) => {
+  let { id, groupnames } = req.body
+
+  if (!id) return res.status(400).json({ message: "id is required", ok: false })
+
+  if (!groupnames) return res.status(400).json({ message: "groupnames is required", ok: false })
+  if (!isStringArray(groupnames))
+    return res.status(400).json({ message: "groupnames is not valid: must be an array of non-empty strings", ok: false })
+
+  // cast the req.body.id to MongoDB ObjectId type to avoid invalid id error from mongoose
+  id = mongoose.Types.ObjectId(id)
+
+  // set the option new to true to return the updated document
+  await Template.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        "app.atlassian.groupnames": groupnames,
+      },
+    },
+    { new: true }
+  )
+    .exec()
+    .then((template) => {
+      if (!template)
+        res.status(404).json({
+          message: "no template found matched the provided id",
+          ok: false,
+        })
+      else
+        res.status(200).json({
+          template,
+          message: "The new template has been updated",
+          ok: true,
+        })
+    })
+    .catch((err) => res.status(500).json({ message: err, ok: false }))
+})
+
 export default updateTemplateRouter
