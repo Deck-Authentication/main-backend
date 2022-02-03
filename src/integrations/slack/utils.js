@@ -132,7 +132,9 @@ export async function inviteToChannel(userIds = "", channelId = "") {
 
   const response = await axios(config).then((res) => res.data)
 
-  if (!response.ok) throw new Error(`Slack API error with userIds ${userIds} and channelId ${channelId}: ${response.error}`)
+  // ignore the case where the user is already in the channel since the user is invited
+  if (!response.ok && response.error !== "already_in_channel")
+    throw new Error(`Slack API error with userIds ${userIds} and channelId ${channelId}: ${response.error}`)
 
   return response.channel
 }
