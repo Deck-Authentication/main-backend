@@ -10,6 +10,11 @@ const member = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // The name of the member
+  name: {
+    type: String,
+    required: true,
+  },
 })
 
 export const TemplateSchema = new mongoose.Schema(
