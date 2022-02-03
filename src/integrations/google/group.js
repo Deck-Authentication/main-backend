@@ -1,6 +1,7 @@
 import { Router } from "express"
 import { google } from "googleapis"
 import { auth } from "./auth"
+import lodash from "lodash"
 
 const groupRouter = Router()
 
@@ -59,6 +60,9 @@ groupRouter.post("/add-members", async (req, res) => {
 groupRouter.delete("/remove-members", async (req, res) => {
   // groupKeys is an array of group emails, while members is an array of user emails
   const { groupKeys, members } = req.body
+
+  if (!lodash.isArray(groupKeys) || !lodash.isArray(members))
+    return res.status(400).json({ message: "groupKeys and members must be arrays", ok: false })
 
   let promises = []
   for (let groupKey of groupKeys) {

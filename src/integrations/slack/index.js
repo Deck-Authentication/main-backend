@@ -100,6 +100,7 @@ slackRouter.delete("/remove-from-channels", async (req, res) => {
   }
 
   let allChannels = {}
+  // get all channel names to filter the matched channels from the input later.
   await slackUtils
     .listConversations()
     .then((channelsObj) => channelsObj.map((channel) => (allChannels[channel.name] = lodash.cloneDeep(channel))))
@@ -108,9 +109,7 @@ slackRouter.delete("/remove-from-channels", async (req, res) => {
   let matchedChannels = []
   channels.map((channelName) => allChannels.hasOwnProperty(channelName) && matchedChannels.push(allChannels[channelName]))
 
-  if (!matchedChannels.length) {
-    res.status(404).json({ message: `Channel not found` })
-  }
+  if (!matchedChannels.length) res.status(404).json({ message: `Channel not found` })
 
   const channelIds = matchedChannels.map((matchedChannel) => matchedChannel.id)
 

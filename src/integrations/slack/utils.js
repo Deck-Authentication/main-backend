@@ -20,8 +20,7 @@ const scimAuthHeaders = {
  * @returns The user object.
  */
 export async function getUser(id = "") {
-  const url =
-    id !== "" ? `${SLACK_SCIM_API}/Users/${id}` : `${SLACK_SCIM_API}/Users`
+  const url = id !== "" ? `${SLACK_SCIM_API}/Users/${id}` : `${SLACK_SCIM_API}/Users`
   const response = await axios.get(url, { headers: scimAuthHeaders })
 
   if (!response.ok) throw new Error(`Slack API error: ${res.error}`)
@@ -133,10 +132,7 @@ export async function inviteToChannel(userIds = "", channelId = "") {
 
   const response = await axios(config).then((res) => res.data)
 
-  if (!response.ok)
-    throw new Error(
-      `Slack API error with userIds ${userIds} and channelId ${channelId}: ${response.error}`
-    )
+  if (!response.ok) throw new Error(`Slack API error with userIds ${userIds} and channelId ${channelId}: ${response.error}`)
 
   return response.channel
 }
@@ -157,10 +153,9 @@ export async function removeFromChannel(userId = "", channelId = "") {
 
   const response = await axios(config).then((res) => res.data)
 
-  if (!response.ok)
-    throw new Error(
-      `Slack API error: removeFromChannel with userId ${userId} and channelId ${channelId}: ${response.error}`
-    )
+  // ignore the case where the user is not in the channel since he/she is already removed
+  if (!response.ok && response.error !== "not_in_channel")
+    throw new Error(`Slack API error: removeFromChannel with userId ${userId} and channelId ${channelId}: ${response.error}`)
 
   return { message: "Successfully removed user from channel" }
 }
