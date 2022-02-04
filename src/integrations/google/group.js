@@ -51,10 +51,15 @@ groupRouter.post("/add-members", async (req, res) => {
       )
     }
   }
-
-  Promise.all(promises)
-    .then((_) => res.status(200).json({ message: "success" }))
-    .catch((err) => res.status(500).json({ message: err }))
+  // Use Promise.allSettled instead of Promise.all since each invitation is independent on each other
+  Promise.allSettled(promises).then((responses) => {
+    for (let response of responses) {
+      // ignore the exception where member is already in the group with the status code 409 for now
+      if (response.status == "rejected" && response?.reason?.response?.status != 409)
+        return res.status(500).json({ message: response.reason, ok: false })
+    }
+    res.status(200).json({ message: "success", ok: true })
+  })
 })
 
 groupRouter.delete("/remove-members", async (req, res) => {
