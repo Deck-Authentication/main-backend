@@ -51,9 +51,8 @@ jiraRouter.post("/invite-to-team", async (req, res) => {
     for (let response of responses) {
       // since the groupname and the accountId are provided and not empty, the 400 can only from the case where the user is already in the group
       // in that case, we ignore the error since we've fulfilled the user invitation request
-      if (response.status == "rejected" && response?.reason?.response?.status != 400) {
+      if (response.status == "rejected" && response?.reason?.response?.status != 400)
         return res.status(500).json({ error: response.reason, ok: false })
-      }
     }
 
     res.status(200).json({ message: "Successfully invite users to groups" })
@@ -88,6 +87,12 @@ jiraRouter.delete("/remove-from-team", async (req, res) => {
   })
 
   await Promise.allSettled(promises).then((responses) => {
+    for (let response of responses) {
+      // since the groupname and the accountId are provided and not empty, the 400 can only from the case where the user is already in the group
+      // in that case, we ignore the error since we've fulfilled the user removal request
+      if (response.status === "rejected" && response?.reason?.response?.status != 400)
+        return res.status(500).json({ error: response.reason, ok: false })
+    }
     res.status(200).json({ message: "Successfully remove users from groups", ok: true })
   })
 })
