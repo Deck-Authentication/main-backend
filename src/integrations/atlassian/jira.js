@@ -64,7 +64,7 @@ jiraRouter.get("/get-all-groups", async (_, res) => {
   await jiraClient.groups
     .findGroups()
     .then((groups) => res.status(200).json({ groups: groups.groups }))
-    .catch((err) => res.status(500).send(err))
+    .catch((err) => res.status(500).json({ message: err, ok: false }))
 })
 
 jiraRouter.delete("/remove-from-team", async (req, res) => {
@@ -72,7 +72,7 @@ jiraRouter.delete("/remove-from-team", async (req, res) => {
 
   const usersPromises = emails.map((email) => findUser(email))
 
-  const users = await Promise.all(usersPromises).catch((err) => res.status(500).send(err))
+  const users = await Promise.all(usersPromises).catch((err) => res.status(500).json({ message: err, ok: false }))
 
   let promises = []
 
@@ -87,9 +87,9 @@ jiraRouter.delete("/remove-from-team", async (req, res) => {
     })
   })
 
-  await Promise.all(promises)
-    .then(() => res.status(200).json({ message: "Successfully remove users from groups" }))
-    .catch((err) => res.status(500).send(err))
+  await Promise.allSettled(promises).then((responses) => {
+    res.status(200).json({ message: "Successfully remove users from groups", ok: true })
+  })
 })
 
 jiraRouter.get("/get-all-users-in-group", async (req, res) => {
@@ -102,11 +102,11 @@ jiraRouter.get("/get-all-users-in-group", async (req, res) => {
 
 // This route is for testing purposes only
 jiraRouter.get("/get-projects", async (_, res) => {
-  const projects = await jiraClient.projects.getAllProjects().catch((err) => res.status(500).json(err))
+  const projects = await jiraClient.projects.getAllProjects().catch((err) => res.status(500).json({ message: err, ok: false }))
 
   console.log(projects)
 
-  res.status(200).json(projects)
+  res.status(200).json({ projects, ok: true })
 })
 
 export default jiraRouter
