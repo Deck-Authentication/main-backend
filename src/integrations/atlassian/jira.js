@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { findUser } from "./jiraUtils"
+import { findUser, getUsersFromGroup } from "./jiraUtils"
 import { config } from "dotenv"
 import { Version2Client } from "jira.js"
 // load environment variables from .env file
@@ -28,6 +28,7 @@ jiraRouter.post("/invite-to-team", async (req, res) => {
 
   const usersPromises = emails.map((email) => findUser(email))
 
+  // fetch full user info to use the user.accountId
   const users = await Promise.all(usersPromises).catch((err) => {
     console.log(err)
     res.status(500).send(err)
@@ -46,9 +47,17 @@ jiraRouter.post("/invite-to-team", async (req, res) => {
     })
   })
 
-  await Promise.all(promises)
-    .then(() => res.status(200).json({ message: "Successfully invite users to groups" }))
-    .catch((err) => res.status(500).send(err))
+  await Promise.allSettled(promises).then((responses) => {
+    for (let response of responses) {
+      // since the groupname and the accountId are provided and not empty, the 400 can only from the case where the user is already in the group
+      // in that case, we ignore the error since we've fulfilled the user invitation request
+      if (response.status == "rejected" && response?.reason?.response?.status != 400) {
+        return res.status(500).json({ error: response.reason, ok: false })
+      }
+    }
+
+    res.status(200).json({ message: "Successfully invite users to groups" })
+  })
 })
 
 jiraRouter.get("/get-all-groups", async (_, res) => {
@@ -83,8 +92,16 @@ jiraRouter.delete("/remove-from-team", async (req, res) => {
     .catch((err) => res.status(500).send(err))
 })
 
+jiraRouter.get("/get-all-users-in-group", async (req, res) => {
+  const { groupname } = req.query
+
+  const users = await getUsersFromGroup(groupname).catch((err) => res.status(500).json({ message: err, ok: false }))
+
+  res.status(200).json({ users: users, ok: true })
+})
+
 // This route is for testing purposes only
-jiraRouter.get("/get-projects", async (req, res) => {
+jiraRouter.get("/get-projects", async (_, res) => {
   const projects = await jiraClient.projects.getAllProjects().catch((err) => res.status(500).json(err))
 
   console.log(projects)

@@ -32,3 +32,15 @@ export async function findUser(email) {
 
   return users[0]
 }
+
+export async function getUsersFromGroup(groupname) {
+  const users = await jiraClient.groups
+    .getUsersFromGroup({
+      groupname: groupname,
+    })
+    .catch((err) => {
+      throw new Error(err)
+    })
+
+  return users
+}
