@@ -53,7 +53,23 @@ templateRouter.post("/create-template", async (req, res) => {
   return res.status(200).json({ template, message: "The template has been created", ok: true })
 })
 
-templateRouter.delete("/remove-template", (req, res) => {})
+templateRouter.delete("/remove-template", async (req, res) => {
+  const { id } = req.body
+  if (!id || !id.trim()) return res.status(400).json({ message: "id is required as a nonempty string", ok: false })
+
+  // cast the id to MongoDB ObjectId type to avoid invalid id error from mongoose
+  const _id = mongoose.Types.ObjectId(id)
+
+  const template = await Template.findByIdAndDelete(_id).catch((err) => res.status(500).json({ message: err, ok: false }))
+
+  if (!template)
+    return res.status(404).json({
+      message: "no template found matched the provided id",
+      ok: true,
+    })
+
+  return res.status(200).json({ message: "The template has been deleted", ok: true })
+})
 
 templateRouter.use("/update-template", updateRouter)
 
