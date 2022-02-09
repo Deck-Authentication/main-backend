@@ -23,8 +23,6 @@ jiraRouter.delete("/delete-team", async (req, res) => {})
 
 jiraRouter.post("/invite-to-team", async (req, res) => {
   const { groupnames, emails } = req.body
-  console.log("groupnames", groupnames)
-  console.log("emails", emails)
 
   const usersPromises = emails.map((email) => findUser(email))
 
