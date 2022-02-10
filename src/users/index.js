@@ -13,7 +13,12 @@ userRouter.get("/get-user/:email", async (req, res) => {
   }
 })
 
-userRouter.get("/list-users", async (req, res) => {})
+// return all users in the database
+userRouter.get("/list-all", async (req, res) => {
+  const users = await User.find().catch((err) => res.status(500).json({ message: err, ok: false }))
+
+  res.status(200).json({ users, ok: true })
+})
 
 userRouter.post("/create-user", async (req, res) => {
   const { email, name } = req.body
