@@ -27,9 +27,7 @@ userRouter.post("/create", async (req, res) => {
   if (!name?.trim()) return res.status(400).json({ message: "name is required as a nonempty string", ok: false })
 
   // we must check if the user email already exists before creating a new one
-  const existingUser = await User.findOne({ "members.email": email }).catch((err) =>
-    res.status(500).json({ message: err, ok: false })
-  )
+  const existingUser = await User.findOne({ email }).catch((err) => res.status(500).json({ message: err, ok: false }))
 
   if (existingUser) return res.status(400).json({ message: "User already exists", ok: false })
 
