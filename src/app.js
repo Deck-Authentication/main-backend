@@ -4,6 +4,7 @@ import googleRouter from "./integrations/google"
 import githubRouter from "./integrations/github"
 import atlassianRouter from "./integrations/atlassian"
 import templateRouter from "./template"
+import userRouter from "./users"
 import cors from "cors"
 import { connectDB } from "./database"
 const app = express()
@@ -22,8 +23,13 @@ app.get("/", (_, res) => {
   res.send("Hello World!")
 })
 
+// templates
 app.use("/template", templateRouter)
 
+// users
+app.use("/users", userRouter)
+
+// apps
 app.use("/slack", slackRouter)
 app.use("/google", googleRouter)
 app.use("/github", githubRouter)
