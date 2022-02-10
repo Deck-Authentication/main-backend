@@ -20,7 +20,8 @@ userRouter.get("/list-all", async (req, res) => {
   res.status(200).json({ users, ok: true })
 })
 
-userRouter.post("/create-user", async (req, res) => {
+// create an user given their email and name
+userRouter.post("/create", async (req, res) => {
   const { email, name } = req.body
   if (!email?.trim()) return res.status(400).json({ message: "email is required as a nonempty string", ok: false })
   if (!name?.trim()) return res.status(400).json({ message: "name is required as a nonempty string", ok: false })
@@ -39,8 +40,8 @@ userRouter.post("/create-user", async (req, res) => {
   else res.status(500).json({ message: "Error in creating new user", ok: false })
 })
 
-userRouter.put("/update-user", async (req, res) => {})
+userRouter.put("/update", async (req, res) => {})
 
-userRouter.delete("/delete-user", async (req, res) => {})
+userRouter.delete("/delete", async (req, res) => {})
 
 export default userRouter
