@@ -10,11 +10,11 @@ userRouter.get("/get-user", async (req, res) => {
   // cast the req.body.id to MongoDB ObjectId type to avoid invalid id error from mongoose
   const _id = mongoose.Types.ObjectId(id)
 
-  const user = await User.findById(id).catch((err) => res.status(500).send(err))
+  const user = await User.findById(id).catch((err) => res.status(500).json({ message: err, ok: false }))
   if (user) {
-    res.status(200).json({ user })
+    res.status(200).json({ message: user, ok: true })
   } else {
-    res.status(404).json({ message: "User not found" })
+    res.status(404).json({ message: "User not found", ok: false })
   }
 })
 
