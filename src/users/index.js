@@ -1,11 +1,16 @@
 import { Router } from "express"
 import { User } from "../database/user"
+import mongoose from "mongoose"
 
 const userRouter = Router()
 
-userRouter.get("/get-user/:email", async (req, res) => {
-  const { email } = req.params
-  const user = await User.findOne({ "members.email": email }).catch((err) => res.status(500).send(err))
+// get user by Id
+userRouter.get("/get-user", async (req, res) => {
+  const { id } = req.query
+  // cast the req.body.id to MongoDB ObjectId type to avoid invalid id error from mongoose
+  const _id = mongoose.Types.ObjectId(id)
+
+  const user = await User.findById(id).catch((err) => res.status(500).send(err))
   if (user) {
     res.status(200).json({ user })
   } else {
