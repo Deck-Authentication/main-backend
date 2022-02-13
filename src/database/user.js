@@ -1,16 +1,12 @@
 const mongoose = require("mongoose")
 
-const TeamReferenceSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  // ObjectId of the team. This is helpful for searching
-  _id: {
-    type: String,
-    required: true,
-  },
-})
+// const TeamReferenceSchema = new mongoose.Schema({
+//   // ObjectId of the team for reference. This is helpful for searching
+//   referenceId: {
+//     type: String,
+//     required: true,
+//   },
+// })
 
 export const UserSchema = new mongoose.Schema(
   {
@@ -22,7 +18,7 @@ export const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    team: [TeamReferenceSchema],
+    team: [String],
   },
   { collection: "user" }
 )

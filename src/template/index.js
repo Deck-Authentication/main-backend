@@ -26,7 +26,7 @@ templateRouter.get("/get-template-by-id/:id", async (req, res) => {
           message: "no template found matched the provided id",
           ok: true,
         })
-      else res.status(200).json({ template, ok: true })
+      else res.status(200).json({ message: template, ok: true })
     })
     .catch((err) => res.status(500).json({ message: err, ok: false }))
 })
@@ -60,6 +60,6 @@ templateRouter.delete("/remove-template", async (req, res) => {
   return res.status(200).json({ message: "The template has been deleted", ok: true })
 })
 
-templateRouter.use("/update-template", updateRouter)
+templateRouter.use("/update", updateRouter)
 
 export default templateRouter

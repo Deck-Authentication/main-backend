@@ -1,6 +1,7 @@
 import { Router } from "express"
 import { User } from "../database/user"
 import mongoose from "mongoose"
+import lodash from "lodash"
 
 const userRouter = Router()
 
@@ -43,7 +44,21 @@ userRouter.post("/create", async (req, res) => {
   else res.status(500).json({ message: "Error in creating new user", ok: false })
 })
 
-userRouter.put("/update", async (req, res) => {})
+userRouter.put("/update/team", async (req, res) => {
+  const { _id, team } = req.body
+
+  if (!_id?.trim()) return res.status(400).json({ message: "_id is required as a nonempty string", ok: false })
+  if (!lodash.isArray(team)) return res.status(400).json({ message: "team is required as an array of strings", ok: false })
+
+  // cast the _id to MongoDB ObjectId type to avoid invalid id error from mongoose
+  let id = mongoose.Types.ObjectId(_id)
+
+  // set the option new to true to return the updated document
+  await User.findByIdAndUpdate(id, { team })
+    .exec()
+    .then((_) => res.status(200).json({ message: "Successfully update user", ok: true }))
+    .catch((err) => res.status(500).json({ message: err, ok: false }))
+})
 
 userRouter.delete("/delete", async (req, res) => {})
 

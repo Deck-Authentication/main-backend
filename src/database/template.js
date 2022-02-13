@@ -1,22 +1,5 @@
 const mongoose = require("mongoose")
 
-const member = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-  },
-  // Object Id of the members. This is helpful for searching
-  referenceId: {
-    type: String,
-    required: true,
-  },
-  // The name of the member
-  name: {
-    type: String,
-    required: true,
-  },
-})
-
 export const TemplateSchema = new mongoose.Schema(
   {
     app: {
@@ -31,7 +14,8 @@ export const TemplateSchema = new mongoose.Schema(
       },
     },
     name: String,
-    members: [member],
+    // an array of member _id strings
+    members: [String],
   },
   { collection: "template" }
 )
