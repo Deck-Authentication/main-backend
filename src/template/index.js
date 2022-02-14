@@ -5,10 +5,10 @@ import updateRouter from "./update"
 
 const templateRouter = Router()
 
-templateRouter.get("/get-all-template", async (_, res) => {
+templateRouter.get("/list-all", async (_, res) => {
   await Template.find({})
     .exec()
-    .then((template) => res.status(200).json({ template, ok: true }))
+    .then((template) => res.status(200).json({ message: template, ok: true }))
     .catch((err) => res.status(500).json({ message: err, ok: false }))
 })
 
