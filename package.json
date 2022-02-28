@@ -28,6 +28,7 @@
     "esm": "^3.2.25",
     "express": "^4.17.2",
     "googleapis": "^92.0.0",
+    "helmet": "^5.0.2",
     "jira.js": "^2.10.0",
     "lodash": "^4.17.21",
     "mongoose": "^6.1.6",
