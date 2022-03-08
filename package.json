@@ -27,9 +27,11 @@
     "dotenv": "^11.0.0",
     "esm": "^3.2.25",
     "express": "^4.17.2",
+    "express-jwt": "^6.1.1",
     "googleapis": "^92.0.0",
     "helmet": "^5.0.2",
     "jira.js": "^2.10.0",
+    "jwks-rsa": "^2.0.5",
     "lodash": "^4.17.21",
     "mongoose": "^6.1.6",
     "octokit": "^1.7.1"
