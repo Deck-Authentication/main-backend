@@ -43,12 +43,13 @@ app.use(cors(corsOptions))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(helmet())
-// Secure the backend auth0 API management
-app.use(jwtCheck)
 
 app.get("/", (_, res) => {
-  res.status(200).send("Welcome to the Deck API")
+  res.status(200).send("Welcome to the Deck API. To learn more or sign up for Deck, visit https://withdeck.com")
 })
+
+// Secure the backend auth0 API management
+app.use(jwtCheck)
 
 // templates
 app.use("/template", templateRouter)
