@@ -49,7 +49,7 @@ app.get("/", (_, res) => {
 })
 
 // Secure the backend auth0 API management
-// app.use(jwtCheck)
+app.use(jwtCheck)
 
 // templates
 app.use("/template", templateRouter)
