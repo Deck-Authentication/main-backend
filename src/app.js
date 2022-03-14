@@ -48,8 +48,8 @@ app.get("/", (_, res) => {
   res.status(200).send("Welcome to the Deck API. To learn more or sign up for Deck, visit https://withdeck.com")
 })
 
-// Secure the backend auth0 API management
-// app.use(jwtCheck)
+// Secure the backend auth0 API management in production mode
+process.env.ENVIRONMENT === "production" ? app.use(jwtCheck) : null
 
 // templates
 app.use("/template", templateRouter)
