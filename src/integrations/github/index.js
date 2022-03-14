@@ -17,15 +17,12 @@ githubRouter.post("/invite-to-team", async (req, res) => {
   team_slugs.map((team_slug) => {
     users.map((user) =>
       invitations.push(
-        octokit.request(
-          "PUT /orgs/:org/teams/:team_slug/memberships/:username",
-          {
-            org,
-            team_slug,
-            username: user.username,
-            role: user.role,
-          }
-        )
+        octokit.request("PUT /orgs/:org/teams/:team_slug/memberships/:username", {
+          org,
+          team_slug,
+          username: user.username,
+          role: user.role,
+        })
       )
     )
   })
@@ -44,11 +41,24 @@ githubRouter.post("/invite-to-team", async (req, res) => {
         message: `Invite successfully`,
       })
     })
-    .catch((err) =>
-      res
-        .status(500)
-        .json({ message: "Request failed from Github", error: err })
-    )
+    .catch((err) => res.status(500).json({ message: "Request failed from Github", error: err }))
+})
+
+githubRouter.get("/test", async (req, res) => {
+  res.send("Good")
+})
+
+githubRouter.get("/list-teams", async (req, res) => {
+  const { org } = req.query
+
+  const teams = await octokit
+    .request("GET /orgs/:org/teams", { org })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log(err)
+      res.status(500).json({ message: err, ok: false })
+    })
+  res.status(200).json({ teams, ok: true })
 })
 
 githubRouter.delete("/remove-from-team", async (req, res) => {
@@ -59,14 +69,11 @@ githubRouter.delete("/remove-from-team", async (req, res) => {
   team_slugs.map((team_slug) => {
     usernames.map((username) =>
       removals.push(
-        octokit.request(
-          "DELETE /orgs/:org/teams/:team_slug/memberships/:username",
-          {
-            org,
-            team_slug,
-            username,
-          }
-        )
+        octokit.request("DELETE /orgs/:org/teams/:team_slug/memberships/:username", {
+          org,
+          team_slug,
+          username,
+        })
       )
     )
   })
@@ -85,11 +92,7 @@ githubRouter.delete("/remove-from-team", async (req, res) => {
         message: `Remove successfully`,
       })
     })
-    .catch((err) =>
-      res
-        .status(500)
-        .json({ message: "Request failed from Github", error: err })
-    )
+    .catch((err) => res.status(500).json({ message: "Request failed from Github", error: err }))
 })
 
 githubRouter.post("/create-team", (req, res) => {})
